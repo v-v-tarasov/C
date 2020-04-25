@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 
 struct students{
@@ -17,6 +16,7 @@ struct students{
     int rating [3];
 };
 
+void message();
 void w_menu();
 void w_new();
 void w_edit();
@@ -26,9 +26,28 @@ void w_all();
 int main(void){
     system ("clear");
     loop: w_menu();
-    // system ("clear");
     goto loop;
     return 0;
+}
+
+void message(){
+    printf("\n\n");
+    printf("Вернуться в главное меню [1]+[Enter], завершить работу [2]+[Enter]: ");
+    int input;
+    scanf("%d", &input);
+    switch (input){
+        case 1:
+            system("clear");
+            main();
+            break;
+        case 2:
+            system("clear");
+            exit(1);
+            break;
+        default:
+            system("clear");
+            exit(1);
+    }
 }
 
 void w_menu(){
@@ -38,17 +57,20 @@ void w_menu(){
     printf("- Сформировать ведомость успеваемости: - [3]\n");
     printf("- Вывести все записи ведомости:        - [4]\n");
     printf("- Закончить работу и выйти:            - [5]\n\n");
-    printf("Выберите действие, введите № действия и нажмите [Enter]: ");
+    printf("Выберите действие, введите [№] действия и нажмите [Enter]: ");
     int menu = 0;
     scanf("%d", &menu);
     switch(menu){
         case 1:
+            system("clear");
             w_new();
             break;
         case 2:
+            system("clear");
             w_edit();
             break;
         case 3:
+            system("clear");
             w_find();
             break;
         case 4:
@@ -56,13 +78,14 @@ void w_menu(){
             w_all();
             break;
         case 5:
+            system("clear");
             exit(1);
         default:
-            printf("Ошибка! Необходими введить: [1], [2], [3], [4] или [5] для выхода.\n");
-            sleep(2);
+            system("clear");
+            printf("Ошибка ввода!");
+            message();
     }
 }
-
 
 void w_new(){
     FILE *wd;
@@ -70,16 +93,13 @@ void w_new(){
     if (wd == NULL){
         system("clear");
         printf("Ошибка при создании файла!\n");
-        sleep(2);
-        main();
+        message();
     }
     fclose(wd);
     system("clear");
     printf("Новый файл ведомости успешно создан!\n");
-    sleep(2);
-    system("clear");
+    message();
 }
-
 
 void w_edit(){
     FILE *wd;
@@ -87,8 +107,7 @@ void w_edit(){
     if (wd == NULL){
         system("clear");
         printf("Ошибка при редактировании файла!\n");
-        sleep(2);
-        main();
+        message();
     }
     system("clear");
     struct students stu;
@@ -113,13 +132,61 @@ void w_edit(){
     scanf("%d", &(stu.rating [2]));
     fwrite(&stu, sizeof(stu), 1, wd);
     fclose(wd);
+    message();
 }
-
 
 void w_find(){
-
+    struct students stu;
+    int file_read = 0;
+    int line = 0;
+    int find_rat;
+    char s [102];
+    FILE *wd;
+    wd = fopen("Wedomosti.dat", "rb");
+    if (wd == NULL){
+        system("clear");
+        printf("Ошибка при чтении файла!\n");
+        message();
+    }
+    while (fgets(s, 100, wd) != NULL){
+        line++;
+    }
+    fclose(wd);
+    printf("Введите оценку для вывода ведомости успеваемости:");
+    scanf("%d", &find_rat);
+    printf("\n");
+    printf("Студенты имеющие итоговую оценку %d:", find_rat);
+    printf("\n\n");
+    wd = fopen("Wedomosti.dat","rb");
+    if (wd == NULL){
+        system("clear");
+        printf("Ошибка при чтении файла!\n");
+        message();
+    }
+    printf("#  ");
+    printf("ФАМИЛИЯ: \t");
+    printf("ИМЯ:\t\t");
+    printf("ОТЧЕСТВО: \t");
+    printf("ГРУППА: \t ");
+    printf(" ОЦЕНКИ:");
+    printf("\n");
+    for (int i = 1; i < line; i++){
+        file_read=fread(&stu, sizeof(stu), 1, wd);
+            if (stu.rating[0] == find_rat || stu.rating[1] == find_rat || stu.rating[2] == find_rat){
+                printf("%2d ", i); 
+                printf("%-11s", stu.surname);
+                printf("\t%-15s", stu.name);
+                printf("\t%-12s", stu.patronymic);
+                printf("\t%-12s", stu.group_number);
+                printf("\t%3d", stu.rating[0]);
+                printf("%3d", stu.rating[1]);
+                printf("%3d", stu.rating[2]);
+                printf("\n");
+            }
+    }
+    fclose(wd);
+    message();
 }
-
 
 void w_all(){
     struct students stu;
@@ -131,8 +198,7 @@ void w_all(){
     if (wd == NULL){
         system("clear");
         printf("Ошибка при чтении файла!\n");
-        sleep(2);
-        main();
+        message();
     }
     while (fgets(s, 100, wd) != NULL){
         line++;
@@ -142,8 +208,7 @@ void w_all(){
     if (wd == NULL){
         system("clear");
         printf("Ошибка при чтении файла!\n");
-        sleep(2);
-        main();
+        message();
     }
     printf("#  ");
     printf("ФАМИЛИЯ: \t");
@@ -165,38 +230,5 @@ void w_all(){
         printf("\n");
     }
     fclose(wd);
-    printf("\n\n");
-    printf("Вернуться в главное меню [1]+[Enter], завершить работу [2]+[Enter]: ");
-    int input;
-    scanf("%d", &input);
-    switch (input){
-        case 1:
-            system("clear");
-            main();
-            break;
-        case 2:
-            system("clear");
-            exit(1);
-            break;
-        default:
-            system("clear");
-            exit(1);
-    }
+    message();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
