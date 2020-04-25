@@ -232,3 +232,4 @@ void w_all(){
     fclose(wd);
     message();
 }
+
